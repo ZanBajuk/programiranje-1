@@ -25,6 +25,13 @@ medved. Zvrhano zibelko sladkih hrušk mi je prinesel za en sam izdrt trn"."""
 # >>> find_words(test_text, 'de')
 # {'izdere', 'debel', 'oddide', 'začudeno'}
 ###############################################################################
+import re
+
+def find_words(besedilo, niz):
+    x = re.findall(rf"[^\s]*{niz}[^\s,\.]*", besedilo)
+    return set(x)
+
+print(find_words(test_text, 'de'))
 
 
 ###############################################################################
@@ -34,7 +41,11 @@ medved. Zvrhano zibelko sladkih hrušk mi je prinesel za en sam izdrt trn"."""
 # >>> find_prefix(test_text, 'zi')
 # {'zibala', 'zibel', 'zibelko'}
 ###############################################################################
+def find_prefix(besedilo, niz):
+    x = re.findall(rf"\b{niz}\w+", besedilo)
+    return set(x)
 
+print(find_prefix(test_text, 'zi'))
 
 ###############################################################################
 # 3) Sestavite funkcijo [find_suffix], ki vrne množico vseh besed, ki se
@@ -43,7 +54,11 @@ medved. Zvrhano zibelko sladkih hrušk mi je prinesel za en sam izdrt trn"."""
 # >>> find_suffix(test_text, 'la')
 # {'zibala', 'razveselila', 'prestrašila', 'šivala', 'opazila', 'tla'}
 ###############################################################################
+def find_suffix(besedilo, niz):
+    x = re.findall(rf"\w+{niz}\b", besedilo)
+    return set(x)
 
+print(find_suffix(test_text, 'la'))
 
 ###############################################################################
 # 4) Sestavite funkcijo [double_letters], ki sprejme niz in vrne množico vseh
@@ -52,3 +67,8 @@ medved. Zvrhano zibelko sladkih hrušk mi je prinesel za en sam izdrt trn"."""
 # >>> double_letters('A volunteer is worth twenty pressed men.')
 # {'volunteer', 'pressed'}
 ###############################################################################
+def double_letters(besedilo):
+    x = re.findall(rf"\b(\w*(\w)\2\w*)\b", besedilo)
+    return set(j[0] for j in x)
+
+print(double_letters('A volunteer is worth twenty pressed men.'))
