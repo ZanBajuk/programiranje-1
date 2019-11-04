@@ -4,7 +4,13 @@
 Namig: Definirajte pomožno funkcijo za obračanje seznamov.
 [*----------------------------------------------------------------------------*)
 
-let rec reverse = ()
+let rec reverse list =
+  let rec reverse' list acc =
+  match list with
+  | [] -> acc
+  | x :: xs -> reverse' xs (x :: acc)
+  in
+  reverse' list []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [repeat x n] vrne seznam [n] ponovitev vrednosti [x]. Za neprimerne
@@ -16,7 +22,13 @@ let rec reverse = ()
  - : string list = []
 [*----------------------------------------------------------------------------*)
 
-let rec repeat = ()
+let rec repeat x n =
+  let rec repeat' x n acc =
+  match n with
+  |0 -> acc
+  |n'-> repeat' x (n'-1) (x :: acc)
+  in
+  repeat' x n []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [range] sprejme število in vrne seznam vseh celih števil od 0 do
@@ -27,7 +39,13 @@ let rec repeat = ()
  - : int list = [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10]
 [*----------------------------------------------------------------------------*)
 
-let rec range = ()
+let rec range n =
+  let rec range' n acc =
+    match n with
+    |n' when n'<0 -> acc
+    |n' -> range' (n-1) (n :: acc)
+  in
+  range' n []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map f list] sprejme seznam [list] oblike [x0; x1; x2; ...] in
@@ -39,7 +57,10 @@ let rec range = ()
  - : int list = [2; 3; 4; 5; 6]
 [*----------------------------------------------------------------------------*)
 
-let rec map = ()
+let rec map f xs =
+  match xs with
+  | [] -> []
+  | x :: xs' -> f x :: map f xs'
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map_tlrec] je repno rekurzivna različica funkcije [map].
@@ -49,7 +70,13 @@ let rec map = ()
  - : int list = [2; 3; 4; 5; 6]
 [*----------------------------------------------------------------------------*)
 
-let rec map_tlrec = ()
+let rec map_tlrec f list =
+  let rec map_tlrec' f list acc =
+    match list with
+    | [] -> reverse acc
+    | x :: xs -> map_tlrec' f xs ((f x) :: acc)
+  in
+  map_tlrec' f list []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [mapi] je ekvivalentna python kodi:
@@ -67,7 +94,13 @@ let rec map_tlrec = ()
  - : int list = [0; 1; 2; 5; 6; 7]
 [*----------------------------------------------------------------------------*)
 
-let rec mapi = ()
+let rec mapi f list =
+  let rec mapi' f list ctr acc =
+    match list with
+    |[] -> reverse acc
+    |x :: xs -> mapi' f xs (ctr + 1) ((f x ctr) :: acc)
+  in
+  mapi' f list 0 []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [zip] sprejme dva seznama in vrne seznam parov istoležnih
@@ -79,7 +112,19 @@ let rec mapi = ()
  Exception: Failure "Different lengths of input lists.".
 [*----------------------------------------------------------------------------*)
 
-let rec zip = ()
+let rec zip list1 list2 =
+  let rec zip' list1 list2 acc =
+    match list1 with
+    |x :: xs ->
+      (match list2 with
+      |[] -> failwith "ERROR"
+      |y :: ys -> zip' xs ys ((x, y) :: acc))
+    |[] ->
+      (match list2 with
+      |y :: ys -> failwith "ERROR"
+      |[] -> reverse acc)
+  in
+  zip' list1 list2 []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [unzip] je inverz funkcije [zip], torej sprejme seznam parov
@@ -89,7 +134,13 @@ let rec zip = ()
  - : int list * string list = ([0; 1; 2], ["a"; "b"; "c"])
 [*----------------------------------------------------------------------------*)
 
-let rec unzip = ()
+let rec unzip list =
+  let rec unzip' list acc1 acc2 =
+    match list with
+    |[] -> (reverse acc1, reverse acc2)
+    |(a, b) :: xs -> unzip' xs (a :: acc1) (b :: acc2)
+  in
+  unzip' list [] []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [unzip_tlrec] je repno rekurzivna različica funkcije [unzip].
@@ -113,7 +164,13 @@ let rec unzip_tlrec = ()
  - : int = 12
 [*----------------------------------------------------------------------------*)
 
-let rec loop = ()
+let rec loop condition f x =
+  let rec loop' condition f x =
+    match (condition x) with
+    |false -> x
+    |true -> loop' condition f (f x)
+  in
+  loop' condition f x
 
 (*----------------------------------------------------------------------------*]
  Funkcija [fold_left_no_acc f list] sprejme seznam [x0; x1; ...; xn] in
@@ -125,7 +182,22 @@ let rec loop = ()
  - : string = "FICUS"
 [*----------------------------------------------------------------------------*)
 
-let rec fold_left_no_acc = ()
+let rec fold_left_no_acc f list =
+  let rec fold_left_no_acc' f list acc=
+    match list with
+    |[] -> acc
+    |x :: xs -> fold_left_no_acc' f xs (f acc x)
+  in
+  match list with
+  |a :: b :: xs -> fold_left_no_acc' f xs (f a b)
+  |_ -> failwith "ERROR"
+
+let rec fold_left_no_acc' f list =
+  match list with
+  |[] -> failwith "ERROR"
+  |[x] -> failwith "ERROR"
+  |[a; b] -> f a b
+  | a :: b :: xs -> fold_left_no_acc' f ((f a b) :: xs)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [apply_sequence f x n] vrne seznam zaporednih uporab funkcije [f] na
@@ -139,7 +211,13 @@ let rec fold_left_no_acc = ()
  - : int list = []
 [*----------------------------------------------------------------------------*)
 
-let rec apply_sequence = ()
+let rec apply_sequence f x n =
+  let rec apply_sequence' f x n acc=
+    match n with
+    |n' when n'<0 -> reverse acc
+    |n' -> apply_sequence' f (f x) (n'-1) (x :: acc)
+  in
+  apply_sequence' f x n []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [filter f list] vrne seznam elementov [list], pri katerih funkcija [f]
@@ -149,7 +227,13 @@ let rec apply_sequence = ()
  - : int list = [4; 5]
 [*----------------------------------------------------------------------------*)
 
-let rec filter = ()
+let rec filter f list =
+  let rec filter' f list acc =
+    match list with
+    |[] -> reverse acc
+    |x :: xs -> if f x then filter' f xs (x :: acc) else filter' f xs acc
+  in
+  filter' f list []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [exists] sprejme seznam in funkcijo, ter vrne vrednost [true] čim
@@ -162,7 +246,10 @@ let rec filter = ()
  - : bool = false
 [*----------------------------------------------------------------------------*)
 
-let rec exists = ()
+let rec exists f list =
+  match list with
+  |[] -> false
+  |x :: xs -> if f x then true else exists f xs
 
 (*----------------------------------------------------------------------------*]
  Funkcija [first f default list] vrne prvi element seznama, za katerega
@@ -175,4 +262,7 @@ let rec exists = ()
  - : int = 0
 [*----------------------------------------------------------------------------*)
 
-let rec first = ()
+let rec first f def list =
+  match list with
+  |[] -> def
+  |x :: xs -> if f x then x else first f def xs 
