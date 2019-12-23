@@ -21,6 +21,42 @@ let test_matrix =
      [| 2 ; 4 ; 5 |];
      [| 7 ; 0 ; 1 |] |]
 
+(*let max_cheese cheese_matrix =
+  let rl = Array.length a.(0) - 1 in
+  let cl = Array.length a - 1 in
+  let m = Array.make_matrix cl rl 0 in
+  for j = cl downto 0 do
+    for i = rl downto 0 do
+      if j = cl then
+        (if i = rl then m.(cl).(rl) <- cheese_matrix.(cl).(rl); 
+        else m.(cl).(i) <- (m.(cl).(i+1) + cheese_matrix.(cl).(i));
+      ) else (
+        if i = rl then m.(j).(rl) <- m.(j+1).(rl) + cheese_matrix.(j).(rl);
+        else m.(j).(i) <- ((max m.(j).(i+1) m.(j+1).(i)) + cheese_matrix.(j).(i));
+      )
+  m.(0).(0)*)
+  
+(**
+
+let max_cheese cheese_matrix =
+  let rl = Array.length a.(0) - 1 in
+  let cl = Array.length a - 1 in
+  let m = Array.make_matrix cl rl 0 in
+  for j = cl downto 0 do
+    for i = rl downto 0 do
+      if j = cl then
+        if i = rl then m.(cl).(rl) <- cheese_matrix.(cl).(rl); 
+        else m.(cl).(i) <- (m.(cl).(i+1) + cheese_matrix.(cl).(i));
+      else
+        if i = rl then m.(j).(rl) <- m.(j+1).(rl) + cheese_matrix.(j).(rl);
+        else m.(j).(i) <- ((max m.(j).(i+1) m.(j+1).(i)) + cheese_matrix.(j).(i));
+  m.(0).(0) *)
+  
+  let max_cheese cheese = 
+    let height = Array.length cheese in
+    let width = Array.length chese.(0) in
+    let memo = Array.make_matrix height width 0 in
+
 (*----------------------------------------------------------------------------*]
  Rešujemo problem sestavljanja alternirajoče obarvanih stolpov. Imamo štiri
  različne tipe gradnikov, dva modra in dva rdeča. Modri gradniki so višin 2 in
@@ -36,6 +72,15 @@ let test_matrix =
  # alternating_towers 10;;
  - : int = 35
 [*----------------------------------------------------------------------------*)
+
+let alternating_towers level:
+  let rec modri l =
+    if l <= 0
+  and rdeci l =
+    modri l
+  in
+
+
 
 
 (*----------------------------------------------------------------------------*]

@@ -53,9 +53,13 @@ module type NAT = sig
 
   val eq   : t -> t -> bool
   val zero : t
-  (* Dodajte manjkajoče! *)
-  (* val to_int : t -> int *)
-  (* val of_int : int -> t *)
+
+  val sum : t -> t -> t
+  val dif : t -> t -> t
+  val prod : t -> t -> t
+
+  val to_int : t -> int
+  val of_int : int -> t
 end
 
 (*----------------------------------------------------------------------------*]
@@ -70,10 +74,15 @@ end
 module Nat_int : NAT = struct
 
   type t = int
-  let eq x y = failwith "later"
+  let eq x y = (x=y)
   let zero = 0
-  (* Dodajte manjkajoče! *)
 
+  let sum x y = x + y
+  let dif x y = x - y
+  let prod x y = x * y
+  
+  let to_int t = t
+  let of_int t = t
 end
 
 (*----------------------------------------------------------------------------*]
@@ -90,10 +99,35 @@ end
 
 module Nat_peano : NAT = struct
 
-  type t = unit (* To morate spremeniti! *)
-  let eq x y = failwith "later"
-  let zero = () (* To morate spremeniti! *)
-  (* Dodajte manjkajoče! *)
+  type t = Zero | Succ of t
+  let rec eq x y =
+    match (x, y) with
+    |(Zero, Zero) -> true
+    |(Succ (a), Succ (b)) -> eq a b
+    |_ -> false
+
+  let zero = Zero
+
+  let rec sum x y = match x with
+    |Zero -> y
+    |Succ (a) -> Succ (sum a y)
+
+  let rec dif x y = match (x, y) with
+    |(Zero, _) -> Zero
+    |(Succ a, Succ b) -> dif a b
+    |_ -> y
+
+  let rec prod x y = match x with
+    |Zero -> Zero
+    |Succ a -> sum y (prod a y)
+
+  let rec to_int = function
+    |Zero -> 0
+    |Succ (a) -> 1 + to_int(a)
+
+  let rec of_int = function
+    |x when x<=0 -> Zero
+    |x -> Succ (of_int(x-1))
 
 end
 
@@ -118,7 +152,13 @@ end
  - : int = 4950
 [*----------------------------------------------------------------------------*)
 
-let sum_nat_100 (module Nat : NAT) = ()
+let sum_nat_100 (module Nat : NAT) =
+  let rec sum_int x =
+    match x with
+    |x when x = 0 -> Nat.zero
+    |x -> Nat.sum (Nat.of_int x) (sum_int (x-1))
+  in
+  Nat.to_int (sum_int 100)
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Now we follow the fable told by John Reynolds in the introduction.
@@ -132,8 +172,16 @@ let sum_nat_100 (module Nat : NAT) = ()
 
 module type COMPLEX = sig
   type t
-  val eq : t -> t -> bool
-  (* Dodajte manjkajoče! *)
+
+  val eq   : t -> t -> bool
+  val zero : t
+  val im_unit : t
+
+  val neg : t -> t
+  val con : t -> t
+
+  val sum : t -> t -> t
+  val prod : t -> t -> t 
 end
 
 (*----------------------------------------------------------------------------*]
@@ -145,9 +193,15 @@ module Cartesian : COMPLEX = struct
 
   type t = {re : float; im : float}
 
-  let eq x y = failwith "later"
-  (* Dodajte manjkajoče! *)
+  let eq x y = (x.re = y.re) && (x.im = y.im)
+  let zero = {re = 0.; im = 0.}
+  let im_unit = {re = 0.; im = 1.}
 
+  let neg x = {re = (-1.) *. x.re; im = (-1.) *. x.im}
+  let con x = {re = x.re; im = (-1.) *. x.im}
+
+  let sum x y = {re = x.re +. y.re; im = x.im +. y.im}
+  let prod x y = {re = (x.re *. y.re) -. (x.im *. y.im); im = (x.re *. y.im) +. (x.im *. y.re)}
 end
 
 (*----------------------------------------------------------------------------*]
@@ -158,7 +212,7 @@ end
  pustite za konec (lahko tudi za konec stoletja).
 [*----------------------------------------------------------------------------*)
 
-module Polar : COMPLEX = struct
+(*module Polar : COMPLEX = struct
 
   type t = {magn : float; arg : float}
 
@@ -167,10 +221,14 @@ module Polar : COMPLEX = struct
   let rad_of_deg deg = (deg /. 180.) *. pi
   let deg_of_rad rad = (rad /. pi) *. 180.
 
-  let eq x y = failwith "later"
+  let eq x y = (x.magn = y.magn) && ((x.magn) = (y.magn))
+  let zero = {magn = 1.; arg = 0.}
+  let im_unit = {magn = 1.; arg = pi /. 2.}
+
+  let neg x = {magn = x.magn; if  = (-1.) *. x.im}
   (* Dodajte manjkajoče! *)
 
-end
+end*)
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  SLOVARJI
@@ -186,7 +244,32 @@ end
  [print] (print naj ponovno deluje zgolj na [(string, int) t].
 [*----------------------------------------------------------------------------*)
 
+module type DICT = sig
+  type t
+  val empty : t
 
+  val get : t -> t
+  val insert : t -> t
+  val print : t -> unit
+end
+
+module Dict : DICT = struct
+  type ('key, 'value) t = Empty | Dict of (('key, 'value) t) * ('key, 'value) * (('key, 'value) t)
+  let empty = Empty
+  
+  type 'a option = Some of 'a | None
+
+  let rec get x = function
+    |Empty -> None
+    |Dict(l, (k, v), r) -> if k = x then Some v else if x < k then (get x l) else (get x r)
+
+  let rec insert (k1, v1) = function
+    |Empty -> Dict(Empty, (k1, v1), Empty)
+    |Dict(l, (k, v), r) -> if k = k1 then Dict(l, (k1, v1), r) else if k1 < k then Dict((insert (k1, v1) l), (k ,v), r) else Dict(l, (k ,v), (insert (k1, v1) r))
+
+  let print = failwith "ups"
+
+end
 (*----------------------------------------------------------------------------*]
  Funkcija [count (module Dict) list] prešteje in izpiše pojavitve posameznih
  elementov v seznamu [list] s pomočjo izbranega modula slovarjev.
@@ -198,4 +281,4 @@ end
  - : unit = ()
 [*----------------------------------------------------------------------------*)
 
-let count (module Dict : DICT) list = ()
+(*let count (module Dict : DICT) list = ()*)

@@ -6,6 +6,9 @@
  poddrevesi. Na tej točki ne predpostavljamo ničesar drugega o obliki dreves.
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
 
+type 'a tree =
+  | Empty
+  | Node of ('a tree) * ('a) * ('a tree)
 
 (*----------------------------------------------------------------------------*]
  Definirajmo si testni primer za preizkušanje funkcij v nadaljevanju. Testni
@@ -18,6 +21,9 @@
       0   6   11
 [*----------------------------------------------------------------------------*)
 
+let make_leaf x = Node (Empty, x, Empty)
+
+let test_tree = Node(Node(make_leaf 0, 2, Empty), 5, Node(make_leaf 6, 7, make_leaf 11))
 
 (*----------------------------------------------------------------------------*]
  Funkcija [mirror] vrne prezrcaljeno drevo. Na primeru [test_tree] torej vrne
@@ -33,6 +39,9 @@
  Node (Empty, 2, Node (Empty, 0, Empty)))
 [*----------------------------------------------------------------------------*)
 
+let rec mirror = function
+  |Empty -> Empty
+  |Node(a, el, b) -> Node((mirror b), el, (mirror a))
 
 (*----------------------------------------------------------------------------*]
  Funkcija [height] vrne višino oz. globino drevesa, funkcija [size] pa število
@@ -44,6 +53,13 @@
  - : int = 6
 [*----------------------------------------------------------------------------*)
 
+let rec height = function
+  |Empty -> 0
+  |Node(a, el, b) -> 1 + (max (height a) (height b))
+
+let rec size = function
+  |Empty -> 0
+  |Node(a, el, b) -> 1 + (size a) + (size b)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map_tree f tree] preslika drevo v novo drevo, ki vsebuje podatke
@@ -55,6 +71,10 @@
  Node (Node (Empty, true, Empty), true, Node (Empty, true, Empty)))
 [*----------------------------------------------------------------------------*)
 
+let rec map_tree f tree =
+  match tree with
+  |Empty -> Empty
+  |Node(l,x,r) -> Node((map_tree f l), (f x), (map_tree f r))
 
 (*----------------------------------------------------------------------------*]
  Funkcija [list_of_tree] pretvori drevo v seznam. Vrstni red podatkov v seznamu
@@ -63,6 +83,20 @@
  # list_of_tree test_tree;;
  - : int list = [0; 2; 5; 6; 7; 11]
 [*----------------------------------------------------------------------------*)
+
+(*let rec vstavi_v_list x list =
+  match list with
+  |[] -> [x]
+  |y::ys -> if x < y then x::y::ys else y::(vstavi_v_list x ys)
+
+let rec vstavi_list_v_list list1 list2 =
+  match list1 with
+  |[] -> list2
+  |x::xs -> vstavi_v_list x (vstavi_list_v_list xs list2) 
+
+let rec list_of_tree = function
+  |Empty -> []
+  |Node(l,x,r) -> vstavi_v_list x (vstavi_list_v_list (list_of_tree l) (list_of_tree r))*)
 
 
 (*----------------------------------------------------------------------------*]
@@ -75,6 +109,7 @@
  # test_tree |> mirror |> is_bst;;
  - : bool = false
 [*----------------------------------------------------------------------------*)
+
 
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]

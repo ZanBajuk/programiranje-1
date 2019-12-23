@@ -234,6 +234,6 @@ let rec find_candidate mg zap list =
       )
    in
    match zap with
-     | Historian -> find_candidate' mg 3 list
-     | Teacher -> find_candidate' mg 4 list 
-     | Researcher -> find_candidate' mg 5 list
+     | Historian -> find_candidate' mg 3. list
+     | Teacher -> find_candidate' mg 4. list 
+     | Researcher -> find_candidate' mg 5. list
