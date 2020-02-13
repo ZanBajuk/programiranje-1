@@ -10,7 +10,29 @@ from functools import lru_cache
 
 
 def najdaljse_narascajoce_podzaporedje(sez):
-    return None
+    l = len(sez)
+    def zap(sez, last, i, s):
+        #print(sez, last, i, s)
+        if l - i <= 1:
+            #print("konec", s)
+            return s
+        elif sez[i] >= last:
+            return zap(sez, sez[i], i+1, s + [sez[i]])
+        else:
+            s1 = zap(sez, last, i+1, s)
+            s2 = zap(sez, sez[i],i+1,sez_od(s, sez[i]))
+            if len(s1) > len(s2):
+                return s1
+            else:
+                return s2
+    return zap(sez, sez[0], 1, [sez[0]])
+
+def sez_od(sez, n):
+    for i in range(len(sez)):
+        if sez[i] > n:
+            return sez[0:i] + [n]
+    return sez + [n]
+
 
 ###############################################################################
 # Nepreviden študent je pustil robotka z umetno inteligenco nenadzorovanega.
@@ -46,5 +68,41 @@ soba = [[0, 1, 0, 0, 2],
         [0, 0, 0, 2, 2]]
 
 
+def dist(x,y):
+    return abs(x[0]-y[0]) + abs(x[1]-y[1])
+
 def pobeg(soba, pozicija, koraki):
-    return None
+    cilj = (0,0)
+    m = []
+    for i in range(len(soba)):
+        for j in range(len(soba[0])):
+            if soba[i][j] == 1:
+                cilj = (i,j)
+            m.append((i,j))
+    polja = {}
+    def pob(soba, pozicija, koraki):
+        if koraki == 0:
+            return
+        else:
+            for i in range(4):
+                if i == 0: #desno
+                    ps = (pozicija[0]+1,pozicija[1])
+                elif i == 1:
+                    ps = (pozicija[0],pozicija[1]+1)
+                elif i == 2:
+                    ps = (pozicija[0]-1,pozicija[1])
+                else:
+                    ps = (pozicija[0],pozicija[1]-1)
+                if ps in m:
+                        if soba[ps[0]][ps[1]] == 0:
+                            if ps in polja:
+                                if koraki > polja[ps]:
+                                    polja[ps] = koraki
+                            else:
+                                polja[ps] = koraki
+                                pob(soba, ps, koraki-1)
+    if (pozicija[0],pozicija[1]) in polja:
+        return True
+    return False
+
+

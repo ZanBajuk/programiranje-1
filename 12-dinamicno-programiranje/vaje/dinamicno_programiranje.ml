@@ -73,12 +73,12 @@ let max_cheese cheese_matrix =
  - : int = 35
 [*----------------------------------------------------------------------------*)
 
-let alternating_towers level:
+(*let alternating_towers level:
   let rec modri l =
     if l <= 0
   and rdeci l =
     modri l
-  in
+  in*)
 
 
 
